@@ -47,18 +47,8 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-    app.put("/users", async (req, res) => {
-      const user = req.body;
-      const filter = { email: user.email };
-      const options = { upsert: true };
-      const updateDoc = { $set: user };
-      const result = await usersCollection.updateOne(
-        filter,
-        updateDoc,
-        options
-      );
-      res.send(result);
-    });
+
+    // make admin
 
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -158,6 +148,21 @@ async function run() {
       res.json(result);
     });
 
+
+    app.post('/myOrders', async(req,res)=>{
+      const result = await ordersCollection.insertOne(req.body);
+      res.send(result);
+  });
+    app.get('/myOrders', async (req, res) => {
+    const result = await ordersCollection.find({}).toArray();
+    res.send(result)
+  });
+    app.get('/myOrders/:email', async (req, res) => {
+    const email = req.params.email;
+    const result = await ordersCollection.find({ email: { $regex: email } }).toArray();
+    res.send(result);    
+  });
+  
     app.post("/contact", async (req, res) => {
       const result = await contactCollection.insertOne(req.body);
       res.send(result);
@@ -165,16 +170,6 @@ async function run() {
     app.get("/contact", async (req, res) => {
       const result = await contactCollection.find({}).toArray();
       res.send(result);
-    });
-    app.post("/create-payment-intent", async (req, res) => {
-      const paymentInfo = req.body;
-      const amount = paymentInfo.price * 100;
-      const paymentIntent = await stripe.paymentIntents.create({
-        currency: "usd",
-        amount: amount,
-        payment_method_types: ["card"],
-      });
-      res.json({ clientSecret: paymentIntent.client_secret });
     });
   } finally {
     // await client.close();
