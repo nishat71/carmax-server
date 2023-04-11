@@ -4,6 +4,7 @@ const app = express();
 const cors = require("cors");
 const ObjectId = require("mongodb").ObjectId;
 require("dotenv").config();
+
 const stripe = require('stripe')('sk_test_51LU4MfI6LK4d8noQzeDCmWyeesAuMSpX8Bp904AlJc9PXo4X5lto5IksFAGWFaSThtLdz1hjQBOsv0DPi6ztoBbn00aN9u5hV3');
 
 const port = 8000 || process.env.PORT;
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.y2457.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.o9qo1.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -48,9 +50,10 @@ async function run() {
       res.send(result);
     });
 
-    // make admin
 
-    app.put("/users/:email", async (req, res) => {
+
+    // make admin
+  app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const found = await usersCollection.findOne(filter);
@@ -70,6 +73,8 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateRole);
       res.send(result);
     });
+
+
 
     app.post("/addCar", async (req, res) => {
       const result = await carCollection.insertOne(req.body);
@@ -127,6 +132,8 @@ async function run() {
       res.send(result);
     });
 
+
+    //manage orders
     app.put("/orders/:id", async (req, res) => {
       const id = req.params.id;
       const reqStatus = req.body.status;
